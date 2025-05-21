@@ -28,6 +28,7 @@ type Create = {
 };
 
 export const create = function <T>(createState: StateCreator<T>) {
+  //相当于就是发布订阅模式的发布函数
   return createState ? createImpl(createState) : createImpl;
 } as Create;
 
@@ -47,12 +48,16 @@ export function useStore<TState, StateSlice>(
   equalityFn?: (a: StateSlice, b: StateSlice) => boolean
 ) {
   //useSyncExternalStore
+
+  //useSelector
+  //需要给他传入外部 store 的 subscribe 方法 和  获取状态快照的方法，可以理解为 getState 方法
   const slice = useSyncExternalStoreWithSelector(
     api.subscribe,
     api.getState,
     api.getServerState || api.getState,
-    selector,
-    equalityFn
+    selector, //一个是选择返回指定状态的 selector 函数  根据selector入参获取Snapshot相应属性，避免一些更新
+    equalityFn //自定义的相等性检查函数。 判断原数据和当前数据是否一致（浅比较）
   );
+
   return slice;
 }
